@@ -186,7 +186,7 @@ export class Map {
     Object.keys(this.routes).forEach((id) => this.removeRoute(id));
   }
 
-  hasRoute(id: string) {
+  hasRoute(id: string, startMarkerOptions: any, p0: { position: any; }, endMarkerOptions: any, p1: { position: any; }, carMarkerOptions: any, p2: { position: any; }) {
     return id in this.routes;
   }
 

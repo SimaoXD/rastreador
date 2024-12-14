@@ -14,16 +14,16 @@ datasource db {
 }
 
 model Route {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   source      Place
   destination Place
   distance    Float
   duration    Float
+  freight     Float?
   directions  Json
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
   RouteDriver RouteDriver?
 }
 

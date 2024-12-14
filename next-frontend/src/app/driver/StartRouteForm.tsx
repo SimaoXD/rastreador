@@ -1,20 +1,20 @@
 "use client";
 
 import { PropsWithChildren, useActionState } from "react";
-import { createRouteAction } from "./create-route.action";
+import { startRouteAction } from "./start-route.action";
 
-export function NewRouteForm(props: PropsWithChildren) {
+export function StartRouteForm(props: PropsWithChildren) {
   const [state, formAction] = useActionState<
     {
       error?: string;
       success?: boolean;
     } | null,
     FormData
-  >(createRouteAction, null);
+  >(startRouteAction, null);
   return (
-    <form action={formAction}>
+    <form action={formAction} className="flex flex-col space-y-4">
       {state?.error && <div className="p-4 border rounded text-contrast bg-error">{state.error}</div>}
-      {state?.success && <div className="p-4 border rounded text-contrast bg-success">Rota criada com sucesso!</div>}
+      {state?.success && <div className="p-4 border rounded text-contrast bg-success">Rota iniciada com sucesso!</div>}
       {props.children}
     </form>
   );

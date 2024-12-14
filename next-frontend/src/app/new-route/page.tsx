@@ -2,14 +2,15 @@ import { MapNewRoute } from "./MapNewRoute";
 import { NewRouteForm } from "./NewRouteForm";
 
 export async function searchDirections(source: string, destination: string) {
+  console.log(source, destination);
   const [sourceResponse, destinationResponse] = await Promise.all([
-    fetch(`http://localhost:3000/places?text=${source}`, {
+    fetch(`${process.env.NEST_API_URL}/places?text=${source}`, {
       // cache: "force-cache", //default
       // next: {
       //   revalidate: 1 * 60 * 60 * 24, // 1 dia
       // }
     }),
-    fetch(`http://localhost:3000/places?text=${destination}`, {
+    fetch(`${process.env.NEST_API_URL}/places?text=${destination}`, {
       // cache: "force-cache", //default
       // next: {
       //   revalidate: 1 * 60 * 60 * 24, // 1 dia
@@ -27,17 +28,23 @@ export async function searchDirections(source: string, destination: string) {
     throw new Error("Failed to fetch destination data");
   }
 
-  const [sourceData, destinationData] = await Promise.all([sourceResponse.json(), destinationResponse.json()]);
+  const [sourceData, destinationData] = await Promise.all([
+    sourceResponse.json(),
+    destinationResponse.json(),
+  ]);
 
   const placeSourceId = sourceData.candidates[0].place_id;
   const placeDestinationId = destinationData.candidates[0].place_id;
 
-  const directionsResponse = await fetch(`http://localhost:3000/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`, {
-    // cache: "force-cache", //default
-    // next: {
-    //   revalidate: 1 * 60 * 60 * 24, // 1 dia
-    // },
-  });
+  const directionsResponse = await fetch(
+    `${process.env.NEST_API_URL}/directions?originId=${placeSourceId}&destinationId=${placeDestinationId}`,
+    {
+      // cache: "force-cache", //default
+      // next: {
+      //   revalidate: 1 * 60 * 60 * 24, // 1 dia
+      // },
+    }
+  );
 
   if (!directionsResponse.ok) {
     console.error(await directionsResponse.text());
@@ -53,10 +60,15 @@ export async function searchDirections(source: string, destination: string) {
   };
 }
 
-export async function NewRoutePage({ searchParams }: { searchParams: Promise<{ source: string; destination: string }> }) {
+export async function NewRoutePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ source: string; destination: string }>;
+}) {
   const { source, destination } = await searchParams;
 
-  const result = source && destination ? await searchDirections(source, destination) : null;
+  const result =
+    source && destination ? await searchDirections(source, destination) : null;
   let directionsData = null;
   let placeSourceId = null;
   let placeDestinationId = null;
@@ -104,7 +116,10 @@ export async function NewRoutePage({ searchParams }: { searchParams: Promise<{ s
               Destino
             </label>
           </div>
-          <button type="submit" className="bg-main text-primary p-2 rounded text-xl font-bold">
+          <button
+            type="submit"
+            className="bg-main text-primary p-2 rounded text-xl font-bold"
+          >
             Pesquisar
           </button>
         </form>
@@ -112,22 +127,41 @@ export async function NewRoutePage({ searchParams }: { searchParams: Promise<{ s
           <div className="mt-4 p-4 border rounded text-contrast">
             <ul>
               <li className="mb-2">
-                <strong>Origem:</strong> {directionsData.routes[0].legs[0].start_address}
+                <strong>Origem:</strong>{" "}
+                {directionsData.routes[0].legs[0].start_address}
               </li>
               <li className="mb-2">
-                <strong>Destino:</strong> {directionsData.routes[0].legs[0].end_address}
+                <strong>Destino:</strong>{" "}
+                {directionsData.routes[0].legs[0].end_address}
               </li>
               <li className="mb-2">
-                <strong>Distância:</strong> {directionsData.routes[0].legs[0].distance.text}
+                <strong>Distância:</strong>{" "}
+                {directionsData.routes[0].legs[0].distance.text}
               </li>
               <li className="mb-2">
-                <strong>Duração:</strong> {directionsData.routes[0].legs[0].duration.text}
+                <strong>Duração:</strong>{" "}
+                {directionsData.routes[0].legs[0].duration.text}
               </li>
             </ul>
             <NewRouteForm>
-              {placeSourceId && <input type="hidden" name="sourceId" defaultValue={placeSourceId} />}
-              {placeDestinationId && <input type="hidden" name="destinationId" defaultValue={placeDestinationId} />}
-              <button type="submit" className="bg-main text-primary font-bold p-2 rounded mt-4">
+              {placeSourceId && (
+                <input
+                  type="hidden"
+                  name="sourceId"
+                  defaultValue={placeSourceId}
+                />
+              )}
+              {placeDestinationId && (
+                <input
+                  type="hidden"
+                  name="destinationId"
+                  defaultValue={placeDestinationId}
+                />
+              )}
+              <button
+                type="submit"
+                className="bg-main text-primary font-bold p-2 rounded mt-4"
+              >
                 Adicionar rota
               </button>
             </NewRouteForm>
